@@ -1,7 +1,8 @@
-const sql = require('mysql');
+const mysql = require('mysql');
 const inquirer = require('inquirer');
-const table = require('console.table');
+const cTable = require('console.table');
 const chalk = require('chalk');
+
 
 function logo (color) {
 
@@ -60,47 +61,98 @@ const logoFancy = [
 `                        m"'                                      `,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``
 ];
 
-var i = 0;
-
-var interval = setInterval( () => {
-
-    console.log(chalk.green(logoFancy[i]));
-    i++;
-    if (i >= logoFancy.length) {
-        console.log(logo('blue'));
-        clearInterval(interval);
-        start();
-    }
-  }, 50);
+const connection = mysql.createConnection({
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "admin",
+    database: "employee_tracker"
+});
   
-
-// var ui = new inquirer.ui.BottomBar({ bottomBar : chalk.yellow(logo)});
+connection.connect();
+console.log(connection);
+start();
 
 function start() {
+    var i = 0;
+    var interval = setInterval( () => {
+        console.log(chalk.green(logoFancy[i]));
+        i++;
+        if (i >= logoFancy.length) {
+            console.log(logo('blue'));
+            clearInterval(interval);
+            mainMenu();
+            return;
+        }
+      }, 50);
+}
+
+function mainMenu() {
     inquirer
-    .prompt([{
-        type : 'list',
-        name : "answervuuuuued",
-        message : "Would you like to...",
-        choices : [
-            new inquirer.Separator(chalk.bold.bgGreen('    +  ADD       ')),
-                '+ a department?',
-                '+ a job?',
-                '+ an employee?',
-            new inquirer.Separator(chalk.bold.bgYellow.black('   <O> VIEW      ')),
-                '<O> a department?',
-                '<O> a job?',
-                '<O> an employee?',
-            new inquirer.Separator(chalk.bold.bgRed('    -  EDIT      ')),
-                '- a department?',
-                '- a job?',
-                '- an employee?',
-        ]
-    }])
-    .then(answers => {
-        console.log(answers);
-    })
-    .catch(error => {
-        console.log(error);
+        .prompt({
+            name : "menuChoice",
+            type : 'list',
+            message : "Would you like to...",
+            choices : [
+                new inquirer.Separator(chalk.bold.bgGreen('    +  ADD       ')),
+                    "+ a department?",
+                    "+ a job?",
+                    "+ an employee?",
+                new inquirer.Separator(chalk.bold.bgYellow.black('   <O> VIEW      ')),
+                    "<O> a department?",
+                    "<O> a job?",
+                    "<O> an employee?",
+                new inquirer.Separator(chalk.bold.bgRed('    -  EDIT      ')),
+                    "- a department?",
+                    "- a job?",
+                    "- an employee?"
+            ]
+        })
+        .then(answer => {
+            switch (answer.menuChoice) {
+                // case "+ a department?":
+                //     //function
+                //     break;
+
+                // case "+ a job?":
+                //     //function
+                //     break;
+
+                // case "+ an employee?":
+                //     //function
+                //     break;
+
+                case "<O> a department?":
+                    view("department")
+                    break;
+                case "<O> a job?":
+                    view("jobs")
+                    break;
+                case "<O> an employee?":
+                    view("employee")
+                    break;
+
+                // case "- a department?":
+                //     //function
+                //     break;
+
+                // case "- a job?":
+                //     //function
+                //     break;
+
+                // case '- an employee?':
+                //     //function
+                //     break;
+            }
+        });
+}
+
+
+function view(choice) {
+    let queryString = "SELECT * FROM ";
+    connection.query(queryString + choice, (err, res) => {
+        if (err) throw err;
+        console.log(cTable.getTable(res));
+
     });
 }
