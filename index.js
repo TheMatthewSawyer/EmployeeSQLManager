@@ -2,7 +2,7 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const chalk = require('chalk');
-
+const prompt = require('prompt');
 
 function logo (color) {
 
@@ -18,7 +18,6 @@ function logo (color) {
     !  ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚══════╝     ╚════╝   ╚═════╝   ╚═════╝   ╚═════╝   !
     |                 -=[ Hireling Alteration Logger 9000 ]=-                |
     '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
-
 `);
 }
 
@@ -52,13 +51,13 @@ const logoFancy = [
 `                                     6'     dP 6'     dP                 `,
 `                                      Ybmmmd'   Ybmmmd'                   `,
 ``,``,
-`                      .d*"*bg.  ,pP""Yq.   ,pP""Yq.   ,pP""Yq.  `,
+`                      .d*"*bg.   ,pP""Yq.   ,pP""Yq.   ,pP""Yq. `,
 `                      6MP    Mb 6W'    'Wb 6W'    'Wb 6W'    'Wb `,
 `                      YMb    MM 8M      M8 8M      M8 8M      M8 `,
-`                       'MbmmdM9 YA.    ,A9 YA.    ,A9 YA.    ,A9 `,
-`                            .M'  'Ybmmd9'   'Ybmmd9'   'Ybmmd9'  `,
-`                          .d9                                    `,
-`                        m"'                                      `,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``
+`                       'MbmmdM9 8M      M8 8M      M8 8M      M8 `,
+`                            .M' 8M      M8 8M      M8 8M      M8 `,
+`                          .d9   YA.    ,A9 YA.    ,A9 YA.    ,A9 `,
+`                        m"'      'Ybmmd9'   'Ybmmd9'   'Ybmmd9' `,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``,``
 ];
 
 const connection = mysql.createConnection({
@@ -68,91 +67,136 @@ const connection = mysql.createConnection({
     password: "admin",
     database: "employee_tracker"
 });
-  
+
+// function colors(i) {
+//     const colors = [console.log(chalk.red(logoFancy[i])), console.log(chalk.yellow(logoFancy[i])), console.log(chalk.green(logoFancy[i])), console.log(chalk.cyan(logoFancy[i])), console.log(chalk.blue(logoFancy[i])), console.log(chalk.magenta(logoFancy[i])), console.log(chalk.white(logoFancy[i]))];
+// }
+const colors = [ chalk.red, chalk.yellow, chalk.green, chalk.cyan, chalk.blue, chalk.magenta, chalk.white ];
+// colors = [ chalk.red, chalk.yellow, chalk.green, chalk.cyan, chalk.blue, chalk.magenta, chalk.white ];
+// const insertJobs = [
+//     {
+//         name : "title",
+//         type : 'input',
+//         message : "Job title?"
+//     },
+//     {
+//         name : "salary",
+//         type : 'input',
+//         message : "Job title?"
+//     },
+//     {
+//         name : "department_id",
+//         type : 'input',
+//         message : "Department ID?"
+//     }];
+
 connection.connect();
 console.log(connection);
+require('events').EventEmitter.defaultMaxListeners = 0;
 start();
 
 function start() {
     var i = 0;
+    var y = 0;
     var interval = setInterval( () => {
-        console.log(chalk.green(logoFancy[i]));
+        console.log(colors[y](logoFancy[i]));
         i++;
+        y++;
+        if(y === 7){ y = 0; }
         if (i >= logoFancy.length) {
-            console.log(logo('blue'));
             clearInterval(interval);
             mainMenu();
             return;
         }
-      }, 50);
+      }, 60);
 }
 
 function mainMenu() {
+    console.log(logo('blue'));
     inquirer
-        .prompt({
-            name : "menuChoice",
-            type : 'list',
-            message : "Would you like to...",
-            choices : [
-                new inquirer.Separator(chalk.bold.bgGreen('    +  ADD       ')),
-                    "+ a department?",
-                    "+ a job?",
-                    "+ an employee?",
-                new inquirer.Separator(chalk.bold.bgYellow.black('   <O> VIEW      ')),
-                    "<O> a department?",
-                    "<O> a job?",
-                    "<O> an employee?",
-                new inquirer.Separator(chalk.bold.bgRed('    -  EDIT      ')),
-                    "- a department?",
-                    "- a job?",
-                    "- an employee?"
-            ]
-        })
-        .then(answer => {
+        .prompt([
+            {
+                name : "menuChoice",
+                type : 'list',
+                message : "Would you like to...",
+                choices : [
+                    new inquirer.Separator(chalk.bold.bgYellow.black('   <O> VIEW      ')),
+                        "<O> a department?",
+                        "<O> a job?",
+                        "<O> an employee?",
+                    new inquirer.Separator(chalk.bold.bgGreen('    +  ADD       ')),
+                        "+ a department?",
+                        "+ a job?",
+                        "+ an employee?",
+                    new inquirer.Separator(chalk.bold.bgRed('    -  EDIT      ')),
+                        "- a department?",
+                        "- a job?",
+                        "- an employee?",
+                    new inquirer.Separator(chalk.bold.black.bgWhite('    ?  EXIT      ')),
+                        "[[X]-EXIT- -]]"
+                ]
+            }
+        ])
+        .then( answer => {
             switch (answer.menuChoice) {
-                // case "+ a department?":
-                //     //function
-                //     break;
-
-                // case "+ a job?":
-                //     //function
-                //     break;
-
-                // case "+ an employee?":
-                //     //function
-                //     break;
+                
+                case "+ a department?":
+                    console.log("+ a department?");
+                    break;
+                case "+ a job?":
+                    console.log("+ a job?");
+                    break;
+                case "+ an employee?":
+                    console.log("+ an employee?");
+                    break;
 
                 case "<O> a department?":
-                    view("department")
+                    view("department");
                     break;
                 case "<O> a job?":
-                    view("jobs")
+                    view("jobs");
                     break;
                 case "<O> an employee?":
-                    view("employee")
+                    view("employee");
                     break;
 
-                // case "- a department?":
-                //     //function
-                //     break;
+                case "- a department?":
+                    console.log("- a department?");
+                    break;
+                case "- a job?":
+                    console.log("- a job?");
+                    break;
 
-                // case "- a job?":
-                //     //function
-                //     break;
-
-                // case '- an employee?':
-                //     //function
-                //     break;
+                case "- an employee?":
+                    console.log("- an employee?");
+                    break;
+                
+                case "[[X]-EXIT- -]]":
+                    process.exit(1);
             }
         });
 }
 
-
 function view(choice) {
+    console.log(logo('yellow'));
     let queryString = "SELECT * FROM ";
     connection.query(queryString + choice, (err, res) => {
         if (err) throw err;
         console.log(cTable.getTable(res));
-
+        enterToContinue();
     });
+}
+
+function enterToContinue() {
+    inquirer
+        .prompt([
+            {
+                name : "pressEnter",
+                type : 'list',
+                message : "Press Enter to Continue...",
+                choices : ['']
+            }
+        ]).then(answer => {
+                mainMenu();
+        });
 }
