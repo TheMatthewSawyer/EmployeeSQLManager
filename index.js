@@ -124,10 +124,10 @@ function mainMenu() {
                     addDepartment();
                     break;
                 case "+ a job?":
-                    console.log("+ a job?");
+                    addJob();
                     break;
                 case "+ an employee?":
-                    console.log("+ an employee?");
+                    addEmployee();
                     break;
 
                 case "<O> a department?":
@@ -188,6 +188,77 @@ function addDepartment() {
             connection.query(queryString, (err, res) => {
                 if (err) throw err;
                 console.log(`Added department ${answer.departmentID}: ${answer.departmentName}`);
+                enterToContinue();
+            });
+        });
+    
+}
+
+function addJob() {
+    process.stdout.write('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+    console.log(logo('green'));
+    inquirer
+        .prompt([
+            {
+                name : "jobName",
+                type : 'input',
+                message : "Please enter a title for your new job:",
+            },
+            {
+                name : "jobSalary",
+                type : 'input',
+                message : "Please enter the salary for that job:",
+            },
+            {
+                name : "jobID",
+                type : 'input',
+                message : "Please enter the job's department ID:",
+            },
+        ]).then(answer => {
+            let queryString = `INSERT INTO jobs (title, salary, department_id) VALUES ('${answer.jobName}', ${answer.jobSalary}, ${answer.jobID});`;
+            connection.query(queryString, (err, res) => {
+                if (err) throw err;
+                console.log(`Added job ${answer.jobID}: ${answer.jobName} with a salary of ${answer.jobSalary}`);
+                enterToContinue();
+            });
+        });
+    
+}
+
+function addEmployee() {
+    process.stdout.write('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+    console.log(logo('green'));
+    inquirer
+        .prompt([
+            {
+                name : "firstName",
+                type : 'input',
+                message : "Please enter new employee's first name:",
+            },
+            {
+                name : "lastName",
+                type : 'input',
+                message : "Please enter new employee's last name:",
+            },
+            {
+                name : "jobID",
+                type : 'input',
+                message : "Please enter new employee's job ID:",
+            },
+            {
+                name : "managerID",
+                type : 'input',
+                message : "If employee has a manager, enter manager ID here. Else, enter 'n':",
+            }
+        ]).then(answer => {
+            if(answer.managerID === 'n') {
+                var queryString = `INSERT INTO employee (first_name, last_name, job_id) VALUES ('${answer.firstName}', '${answer.lastName}', ${answer.jobID});`;
+            } else {
+                var queryString = `INSERT INTO employee (first_name, last_name, job_id, manager_id) VALUES ('${answer.firstName}', '${answer.lastName}', ${answer.jobID}, ${answer.managerID});`;
+            }
+            connection.query(queryString, (err, res) => {
+                if (err) throw err;
+                console.log(`Added employee ${answer.lastName}, ${answer.firstName} with the job ${answer.jobID}`);
                 enterToContinue();
             });
         });
