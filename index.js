@@ -277,6 +277,9 @@ function enterToContinue() {
 }
 
 function edit(choice) {
+    process.stdout.write('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+    console.log(logo('red'));
+    process.stdout.write('\n\n');
     var choiceName = choice + '_name';
     var choiceID = choice + '_id';
     let queryString = `SELECT ${choiceName} FROM ${choice};`;
