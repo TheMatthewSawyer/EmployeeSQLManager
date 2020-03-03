@@ -2,22 +2,21 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 const chalk = require('chalk');
-const prompt = require('prompt');
 
 function logo (color) {
 
-    return chalk[color](
+    return chalk.bgRgb(55, 0, 69)[color](
     `
-    .-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=.
-    |                                                                        |
-    !  ██╗  ██╗  █████╗  ██╗          █████╗   ██████╗   ██████╗   ██████╗   !
-    :  ██║  ██║ ██╔══██╗ ██║         ██╔══██╗ ██╔═████╗ ██╔═████╗ ██╔═████╗  :
-    .  ███████║ ███████║ ██║         ╚██████║ ██║██╔██║ ██║██╔██║ ██║██╔██║  .
-    .  ██╔══██║ ██╔══██║ ██║          ╚═══██║ ████╔╝██║ ████╔╝██║ ████╔╝██║  .
-    :  ██║  ██║ ██║  ██║ ███████╗     █████╔╝ ╚██████╔╝ ╚██████╔╝ ╚██████╔╝  :
-    !  ╚═╝  ╚═╝ ╚═╝  ╚═╝ ╚══════╝     ╚════╝   ╚═════╝   ╚═════╝   ╚═════╝   !
-    |                 -=[ Hireling Alteration Logger 9000 ]=-                |
-    '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-='
+▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ 
+▇                                                              ▇ 
+▇  db   db  .d8b.  db      .d888b.  .d88b.   .d88b.   .d88b.   ▇ 
+▇  88   88 d8' '8b 88      88' '8D .8P  88. .8P  88. .8P  88.  ▇ 
+▇  88ooo88 88ooo88 88      'V8o88' 88  d'88 88  d'88 88  d'88  ▇ 
+▇  88'''88 88'''88 88         d8'  '8 d' 8' '8 d' 8' '8 d' 8'  ▇ 
+▇  YP   YP YP   YP Y888P    d8'     'Y88P'   'Y88P'   'Y88P'   ▇ 
+▇                                                              ▇ 
+▇            -=[ Hireling Alteration Logger 9000 ]=-           ▇ 
+▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ -▇ 
 `);
 }
 
@@ -68,27 +67,7 @@ const connection = mysql.createConnection({
     database: "employee_tracker"
 });
 
-// function colors(i) {
-//     const colors = [console.log(chalk.red(logoFancy[i])), console.log(chalk.yellow(logoFancy[i])), console.log(chalk.green(logoFancy[i])), console.log(chalk.cyan(logoFancy[i])), console.log(chalk.blue(logoFancy[i])), console.log(chalk.magenta(logoFancy[i])), console.log(chalk.white(logoFancy[i]))];
-// }
 const colors = [ chalk.red, chalk.yellow, chalk.green, chalk.cyan, chalk.blue, chalk.magenta, chalk.white ];
-// colors = [ chalk.red, chalk.yellow, chalk.green, chalk.cyan, chalk.blue, chalk.magenta, chalk.white ];
-// const insertJobs = [
-//     {
-//         name : "title",
-//         type : 'input',
-//         message : "Job title?"
-//     },
-//     {
-//         name : "salary",
-//         type : 'input',
-//         message : "Job title?"
-//     },
-//     {
-//         name : "department_id",
-//         type : 'input',
-//         message : "Department ID?"
-//     }];
 
 connection.connect();
 console.log(connection);
@@ -112,6 +91,7 @@ function start() {
 }
 
 function mainMenu() {
+    process.stdout.write('\n\n\n\n\n\n\n\n\n\n');
     console.log(logo('blue'));
     inquirer
         .prompt([
@@ -141,7 +121,7 @@ function mainMenu() {
             switch (answer.menuChoice) {
                 
                 case "+ a department?":
-                    console.log("+ a department?");
+                    addDepartment();
                     break;
                 case "+ a job?":
                     console.log("+ a job?");
@@ -178,6 +158,7 @@ function mainMenu() {
 }
 
 function view(choice) {
+    process.stdout.write('\n\n\n\n\n\n\n\n\n\n');
     console.log(logo('yellow'));
     let queryString = "SELECT * FROM ";
     connection.query(queryString + choice, (err, res) => {
@@ -185,6 +166,32 @@ function view(choice) {
         console.log(cTable.getTable(res));
         enterToContinue();
     });
+}
+
+function addDepartment() {
+    process.stdout.write('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+    console.log(logo('green'));
+    inquirer
+        .prompt([
+            {
+                name : "departmentName",
+                type : 'input',
+                message : "Please enter a name for your new department:",
+            },
+            {
+                name : "departmentID",
+                type : 'input',
+                message : "Please enter an ID for your new department:",
+            }
+        ]).then(answer => {
+            let queryString = `INSERT INTO department (department_name, department_id) VALUES ('${answer.departmentName}', ${answer.departmentID});`;
+            connection.query(queryString, (err, res) => {
+                if (err) throw err;
+                console.log(`Added department ${answer.departmentID}: ${answer.departmentName}`);
+                enterToContinue();
+            });
+        });
+    
 }
 
 function enterToContinue() {
