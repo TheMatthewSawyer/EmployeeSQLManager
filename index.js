@@ -141,14 +141,16 @@ function mainMenu() {
                     break;
 
                 case "- a department?":
-                    console.log("- a department?");
+                    edit('department');
                     break;
                 case "- a job?":
-                    console.log("- a job?");
+                    console.log('Not yet made');
+                    enterToContinue();
                     break;
 
                 case "- an employee?":
-                    console.log("- an employee?");
+                    console.log('Not yet made');
+                    enterToContinue();
                     break;
                 
                 case "[[X]-EXIT- -]]":
@@ -217,7 +219,7 @@ function addJob() {
         ]).then(answer => {
             let queryString = `INSERT INTO jobs (title, salary, department_id) VALUES ('${answer.jobName}', ${answer.jobSalary}, ${answer.jobID});`;
             connection.query(queryString, (err, res) => {
-                if (err) throw err;
+                if (err) {console.log(`${chalk.red('ERROR: ')}Ensure the Job's department ID exits and is accurate then try again. You entered ${answer.jobID}`); enterToContinue(); return; }
                 console.log(`Added job ${answer.jobID}: ${answer.jobName} with a salary of ${answer.jobSalary}`);
                 enterToContinue();
             });
@@ -248,21 +250,16 @@ function addEmployee() {
             {
                 name : "managerID",
                 type : 'input',
-                message : "If employee has a manager, enter manager ID here. Else, enter 'n':",
+                message : "If employee has a manager, enter manager ID here. Else, enter 'null':",
             }
         ]).then(answer => {
-            if(answer.managerID === 'n') {
-                var queryString = `INSERT INTO employee (first_name, last_name, job_id) VALUES ('${answer.firstName}', '${answer.lastName}', ${answer.jobID});`;
-            } else {
-                var queryString = `INSERT INTO employee (first_name, last_name, job_id, manager_id) VALUES ('${answer.firstName}', '${answer.lastName}', ${answer.jobID}, ${answer.managerID});`;
-            }
+            var queryString = `INSERT INTO employee (first_name, last_name, job_id, manager_id) VALUES ('${answer.firstName}', '${answer.lastName}', ${answer.jobID}, ${answer.managerID});`;
             connection.query(queryString, (err, res) => {
-                if (err) throw err;
+                if (err) {console.log(`${chalk.red('ERROR: ')}Ensure the employee's job ID / manager ID exists and is accurate then try again. You entered ${answer.jobID} ${answer.managerID}`); enterToContinue(); return; }
                 console.log(`Added employee ${answer.lastName}, ${answer.firstName} with the job ${answer.jobID}`);
                 enterToContinue();
             });
         });
-    
 }
 
 function enterToContinue() {
@@ -277,4 +274,48 @@ function enterToContinue() {
         ]).then(answer => {
                 mainMenu();
         });
+}
+
+function edit(choice) {
+    var choiceName = choice + '_name';
+    var choiceID = choice + '_id';
+    let queryString = `SELECT ${choiceName} FROM ${choice};`;
+    var usrDepartChoices = [];
+    var usrItemChoices = [];
+    connection.query(queryString, (err, res) => {
+        if (err) throw err;
+        res.forEach(element => {
+            usrDepartChoices.push(element[`${choiceName}`]);
+        });
+        let questionProper = [{
+            name : "chosenAns",
+            type : 'list',
+            message : `Please select the ${choice} you wish to edit`,
+            choices : usrDepartChoices
+        }];
+        inquirer.prompt(questionProper).then(answer => {
+            
+            let queryString = `SELECT * FROM ${choice} WHERE ${choiceName} = '${answer.chosenAns}';`;
+            connection.query(queryString, (err, res) => { 
+                if (err) throw err;
+                res.forEach(element => {
+                    usrItemChoices.push(element[`${choiceName}`]);
+                    usrItemChoices.push(element[`${choiceID}`]);
+                });
+
+                let questionProper = [{
+                    name : "chosenEdit",
+                    type : 'list',
+                    message : `Please select value you'd like to change`,
+                    choices : usrItemChoices
+                }];
+
+                inquirer.prompt(questionProper).then(answer => {
+                    console.log(answer);
+                    enterToContinue();
+                });
+
+            });
+        });
+    });
 }
